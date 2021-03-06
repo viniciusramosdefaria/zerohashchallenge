@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	CardPack = cards{SliceOfCards: []string{
+	cardPack = cards{sliceOfCards: []string{
 		"cat",
 		"corolla",
 		"crayon",
@@ -20,50 +20,50 @@ var (
 		"cardinal",
 		"casino",
 	}}
-	UserGroup = Users{SliceOfUsers: map[string]User{
+	userGroup = users{sliceOfUsers: map[string]user{
 		"justin":
 		{
-			Name:       "justin",
-			Multiplier: 2,
+			name:       "justin",
+			multiplier: 2,
 		},
 		"erik":
 		{
-			Name:       "erik",
-			Multiplier: 3,
+			name:       "erik",
+			multiplier: 3,
 		},
 		"alex":
 		{
-			Name:       "alex",
-			Multiplier: 2,
+			name:       "alex",
+			multiplier: 2,
 		},
 		"brian":
 		{
-			Name:       "brian",
-			Multiplier: 2.5,
+			name:       "brian",
+			multiplier: 2.5,
 		},
 		"edward":
 		{
-			Name:       "edward",
-			Multiplier: 1.22,
+			name:       "edward",
+			multiplier: 1.22,
 		},
 		"matt":
 		{
-			Name:       "matt",
-			Multiplier: 1.66,
+			name:       "matt",
+			multiplier: 1.66,
 		},
 	}}
-	TeamFormation = Teams{Teams: []Team{
+	teamFormation = teams{teams: []team{
 		{
-			Name: "red",
-			Users: []string{
+			name: "red",
+			users: []string{
 				"justin",
 				"alex",
 				"erik",
 			},
 		},
 		{
-			Name: "blue",
-			Users: []string{
+			name: "blue",
+			users: []string{
 				"brian",
 				"edward",
 				"matt",
@@ -71,7 +71,7 @@ var (
 		},
 	}}
 
-	TurnOrder = []string{
+	turnOrder = []string{
 		"edward",
 		"justin",
 		"matt",
@@ -81,28 +81,28 @@ var (
 	}
 )
 
-type Score map[string]string
+type score map[string]string
 
 type cards struct {
-	SliceOfCards []string
+	sliceOfCards []string
 }
 
-type User struct {
-	Name       string
-	Multiplier float64
+type user struct {
+	name       string
+	multiplier float64
 }
 
-type Users struct {
-	SliceOfUsers map[string]User
+type users struct {
+	sliceOfUsers map[string]user
 }
 
-type Team struct {
-	Name  string
-	Users []string
+type team struct {
+	name  string
+	users []string
 }
 
-type Teams struct {
-	Teams []Team
+type teams struct {
+	teams []team
 }
 
 func randomInt(max int32) int64 {
@@ -113,16 +113,16 @@ func randomInt(max int32) int64 {
 	return r.Int64()
 }
 
-func GenerateRandomGameData(c cards, turnOrder []string, n int) []Score {
+func generateRandomGameData(c cards, turnOrder []string, n int) []score {
 
 	var turnOrderPosition int
 	var remainingCards cards
-	var s Score = make(map[string]string)
-	var scores []Score
-	var tempCardSlice = make([]string, len(c.SliceOfCards))
+	var s score = make(map[string]string)
+	var scores []score
+	var tempCardSlice = make([]string, len(c.sliceOfCards))
 
 	for i := 0; i < n; i += 1 {
-		remainingCards.SliceOfCards = c.SliceOfCards
+		remainingCards.sliceOfCards = c.sliceOfCards
 		for ; ; {
 			tempCardSlice = []string{}
 			if turnOrderPosition > len(turnOrder)-1 {
@@ -132,29 +132,29 @@ func GenerateRandomGameData(c cards, turnOrder []string, n int) []Score {
 			userTerm := randomInt(3)
 
 			if userTerm != 0 {
-				nextCardPosition := randomInt(int32(len(remainingCards.SliceOfCards) - 1))
-				nextCard := remainingCards.SliceOfCards[nextCardPosition]
+				nextCardPosition := randomInt(int32(len(remainingCards.sliceOfCards) - 1))
+				nextCard := remainingCards.sliceOfCards[nextCardPosition]
 				s[nextCard] = turnOrder[turnOrderPosition]
 
-				for position := 0; position < len(remainingCards.SliceOfCards)-1; position += 1 {
+				for position := 0; position < len(remainingCards.sliceOfCards)-1; position += 1 {
 					if position != int(nextCardPosition) {
-						tempCardSlice = append(tempCardSlice, remainingCards.SliceOfCards[position])
+						tempCardSlice = append(tempCardSlice, remainingCards.sliceOfCards[position])
 					}
 				}
-				remainingCards.SliceOfCards = tempCardSlice
+				remainingCards.sliceOfCards = tempCardSlice
 			}
-			if len(remainingCards.SliceOfCards) == 0 {
+			if len(remainingCards.sliceOfCards) == 0 {
 				break
 			}
 			turnOrderPosition += 1
 		}
 		scores = append(scores, s)
-		s = Score{}
+		s = score{}
 	}
 	return scores
 }
 
-func RunGame(s []Score) string{
+func runGame(s []score) string{
 
 	var maxPoints float64
 	var winner string
@@ -166,17 +166,17 @@ func RunGame(s []Score) string{
 		log.Printf("ROUND %d\n", key+1)
 		playerScores := map[string]float64{}
 		teamScores := map[string]float64{}
-		for _, value := range TurnOrder {
+		for _, value := range turnOrder {
 			playerScores[value] = 0
 		}
 		for _, value := range round {
-			playerScores[value] = playerScores[value] + (1 * UserGroup.SliceOfUsers[value].Multiplier)
+			playerScores[value] = playerScores[value] + (1 * userGroup.sliceOfUsers[value].multiplier)
 		}
 		for key, playerScore := range playerScores {
-			for _, team := range TeamFormation.Teams {
-				for _, participant := range team.Users {
+			for _, team := range teamFormation.teams {
+				for _, participant := range team.users {
 					if participant == key {
-						teamScores[team.Name] = teamScores[team.Name] + playerScore
+						teamScores[team.name] = teamScores[team.name] + playerScore
 					}
 				}
 			}

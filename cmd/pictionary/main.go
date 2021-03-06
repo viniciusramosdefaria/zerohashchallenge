@@ -19,7 +19,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir("static")))
-	mux.Handle("/test/", router)
+	mux.Handle("/test", router)
 	mux.Handle("/metrics", router)
 
 	log.Fatal(http.ListenAndServe(":3000", mux))

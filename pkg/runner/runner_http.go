@@ -46,8 +46,8 @@ func (h handler) Handler() httprouter.Handle {
 		if len(payload.Metadata) > 0 {
 			if payload.Metadata["rounds"] != ""{
 				roundCounter, _ := strconv.Atoi(payload.Metadata["rounds"])
-				rounds := GenerateRandomGameData(CardPack, TurnOrder, roundCounter)
-				winner := RunGame(rounds)
+				rounds := generateRandomGameData(cardPack, turnOrder, roundCounter)
+				winner := runGame(rounds)
 				metrics.Add("winner", winner)
 			}
 		}
