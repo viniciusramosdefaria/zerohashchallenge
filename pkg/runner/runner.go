@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	CardPack = cards{sliceOfCards: []string{
+	CardPack = cards{SliceOfCards: []string{
 		"cat",
 		"corolla",
 		"crayon",
@@ -20,44 +20,50 @@ var (
 		"cardinal",
 		"casino",
 	}}
-	UserGroup = users{sliceOfUsers: []user{
+	UserGroup = Users{SliceOfUsers: map[string]User{
+		"justin":
 		{
-			name:       "justin",
-			multiplier: 2,
+			Name:       "justin",
+			Multiplier: 2,
 		},
+		"erik":
 		{
-			name:       "erik",
-			multiplier: 3,
+			Name:       "erik",
+			Multiplier: 3,
 		},
+		"alex":
 		{
-			name:       "alex",
-			multiplier: 2,
+			Name:       "alex",
+			Multiplier: 2,
 		},
+		"brian":
 		{
-			name:       "brian",
-			multiplier: 2.5,
+			Name:       "brian",
+			Multiplier: 2.5,
 		},
+		"edward":
 		{
-			name:       "edward",
-			multiplier: 1.22,
+			Name:       "edward",
+			Multiplier: 1.22,
 		},
+		"matt":
 		{
-			name:       "matt",
-			multiplier: 1.66,
+			Name:       "matt",
+			Multiplier: 1.66,
 		},
 	}}
-	TeamFormation = teams{teams: []team{
+	TeamFormation = Teams{Teams: []Team{
 		{
-			name: "red",
-			users: []string{
+			Name: "red",
+			Users: []string{
 				"justin",
 				"alex",
 				"erik",
 			},
 		},
 		{
-			name: "blue",
-			users: []string{
+			Name: "blue",
+			Users: []string{
 				"brian",
 				"edward",
 				"matt",
@@ -75,31 +81,31 @@ var (
 	}
 )
 
-type score map[string]string
+type Score map[string]string
 
 type cards struct {
-	sliceOfCards []string
+	SliceOfCards []string
 }
 
-type user struct {
-	name       string
-	multiplier float64
+type User struct {
+	Name       string
+	Multiplier float64
 }
 
-type users struct {
-	sliceOfUsers []user
+type Users struct {
+	SliceOfUsers map[string]User
 }
 
-type team struct {
-	name  string
-	users []string
+type Team struct {
+	Name  string
+	Users []string
 }
 
-type teams struct {
-	teams []team
+type Teams struct {
+	Teams []Team
 }
 
-func RandomInt(max int32) int64 {
+func randomInt(max int32) int64 {
 	r, err := rand.Int(rand.Reader, big.NewInt(int64(max)+1))
 	if err != nil {
 		log.Fatal()
@@ -107,42 +113,96 @@ func RandomInt(max int32) int64 {
 	return r.Int64()
 }
 
-func GenerateRandomGameData(c cards, u users, t teams, turnOrder []string, n int) []score {
+func GenerateRandomGameData(c cards, turnOrder []string, n int) []Score {
 
 	var turnOrderPosition int
 	var remainingCards cards
-	var s score = make(map[string]string)
-	var scores []score
-	var tempCardSlice = make([]string, len(c.sliceOfCards))
+	var s Score = make(map[string]string)
+	var scores []Score
+	var tempCardSlice = make([]string, len(c.SliceOfCards))
 
 	for i := 0; i < n; i += 1 {
-		remainingCards.sliceOfCards = c.sliceOfCards
+		remainingCards.SliceOfCards = c.SliceOfCards
 		for ; ; {
 			tempCardSlice = []string{}
 			if turnOrderPosition > len(turnOrder)-1 {
 				turnOrderPosition = 0
 			}
 
-			userTerm := RandomInt(3)
+			userTerm := randomInt(3)
 
 			if userTerm != 0 {
-				nextCardPosition := RandomInt(int32(len(remainingCards.sliceOfCards) - 1))
-				nextCard := remainingCards.sliceOfCards[nextCardPosition]
+				nextCardPosition := randomInt(int32(len(remainingCards.SliceOfCards) - 1))
+				nextCard := remainingCards.SliceOfCards[nextCardPosition]
 				s[nextCard] = turnOrder[turnOrderPosition]
 
-				for position := 0; position < len(remainingCards.sliceOfCards)-1; position += 1 {
+				for position := 0; position < len(remainingCards.SliceOfCards)-1; position += 1 {
 					if position != int(nextCardPosition) {
-						tempCardSlice = append(tempCardSlice, remainingCards.sliceOfCards[position])
+						tempCardSlice = append(tempCardSlice, remainingCards.SliceOfCards[position])
 					}
 				}
-				remainingCards.sliceOfCards = tempCardSlice
+				remainingCards.SliceOfCards = tempCardSlice
 			}
-			if len(remainingCards.sliceOfCards) == 0 {
+			if len(remainingCards.SliceOfCards) == 0 {
 				break
 			}
 			turnOrderPosition += 1
 		}
 		scores = append(scores, s)
+		s = Score{}
 	}
 	return scores
+}
+
+func RunGame(s []Score) string{
+
+	var maxPoints float64
+	var winner string
+
+	playerFinalScores := map[string]float64{}
+	teamFinalScores := map[string]float64{}
+
+	for key, round := range s {
+		log.Printf("ROUND %d\n", key+1)
+		playerScores := map[string]float64{}
+		teamScores := map[string]float64{}
+		for _, value := range TurnOrder {
+			playerScores[value] = 0
+		}
+		for _, value := range round {
+			playerScores[value] = playerScores[value] + (1 * UserGroup.SliceOfUsers[value].Multiplier)
+		}
+		for key, playerScore := range playerScores {
+			for _, team := range TeamFormation.Teams {
+				for _, participant := range team.Users {
+					if participant == key {
+						teamScores[team.Name] = teamScores[team.Name] + playerScore
+					}
+				}
+			}
+		}
+
+		for key, score := range playerScores {
+			log.Printf("player name: %s, score: %.2f\n", key, score)
+			playerFinalScores[key] += score
+		}
+
+		for key, score := range teamScores {
+			log.Printf("team name: %s, team score: %.2f\n", key, score)
+			teamFinalScores[key] += score
+		}
+	}
+	for key, score := range playerFinalScores {
+		log.Printf("player name: %s, final score: %.2f\n", key, score)
+	}
+
+	for key, score := range teamFinalScores {
+		if score > maxPoints {
+			maxPoints = score
+			winner = key
+
+		}
+		log.Printf("team name: %s, team final score: %.2f\n", key, score)
+	}
+	return winner
 }
