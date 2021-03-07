@@ -66,8 +66,6 @@ NUMBER_OF_ROUNDS=7 make test
 
 ## Future work
 
-- Breaking down methods for the runner package
-- Writing tests
+- Break down methods inside the runner package
+- Write tests
 - Use templates to show info on the front page
-
-
