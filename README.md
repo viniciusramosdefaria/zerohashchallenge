@@ -6,7 +6,7 @@ As part of the interviewing process to work at Zero Hash I did this little proje
 
 ### Web server structure
 
-I converted all game generation to Golang so I could test it properly, after that I created the webserver responsible for running such application, it has the following endpoints:
+I converted all game generation to Golang, so I could test it properly, after that I created the webserver responsible for running such application, it has the following endpoints:
 
 HTTP Method   | URI Path     | Description |
 ------------- | -------------|-------------|
@@ -31,7 +31,7 @@ project
 │   |    │   runner_http.go
 └───cmd
 │   │
-│   └───pictionary(defines what the application is gonna be like and serves it on :3000)
+│   └───pictionary(defines how the application is going to be like and serves it on :3000)
 │   |    │   main.go
 
 ```

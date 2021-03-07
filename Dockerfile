@@ -10,6 +10,7 @@ FROM alpine:3.10.2
 RUN apk update && apk add ca-certificates
 
 COPY --from=0 /go/src/github.com/viniciusramosdefaria/zerohashchallenge/bin/pictionary /server/
+COPY --from=0 /go/src/github.com/viniciusramosdefaria/zerohashchallenge/static /server/static
 
 WORKDIR /server
 
